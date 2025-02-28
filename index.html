@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>El Laberinto del Conocimiento - Quiz Maze Runner</title>
+  <style>
+    /* Estilos generales */
+    body {
+      background-color: #2c3e50;
+      color: #ecf0f1;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    h1, h2, p {
+      text-align: center;
+    }
+    button {
+      cursor: pointer;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    /* Pantalla de inicio */
+    #start-screen {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #2c3e50;
+    }
+    #start-screen h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+    #start-screen p {
+      font-size: 20px;
+      margin-bottom: 30px;
+    }
+    #start-btn {
+      background-color: #e67e22;
+      color: #fff;
+    }
+
+    /* Contenedor del quiz */
+    #quiz-container {
+      padding: 20px;
+      display: none;
+    }
+
+    /* Contenedor del laberinto y progreso */
+    #maze-progress-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    #maze-container {
+      position: relative;
+      width: 500px;
+      height: 300px;
+      border: 2px solid #ecf0f1;
+      border-radius: 5px;
+      overflow: hidden;
+      background-color: #2c3e50;
+    }
+    /* Laberinto en SVG */
+    #maze-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    /* El punto que se mueve en el laberinto */
+    #maze-dot {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background-color: #e74c3c;
+      border-radius: 50%;
+      /* Posición inicial */
+      left: 30px;
+      top: 270px;
+      transition: left 0.5s, top 0.5s;
+    }
+
+    /* Preguntas */
+    .question {
+      background: #34495e;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+      display: none;
+    }
+    .question p {
+      margin-bottom: 10px;
+    }
+    .options label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .btn-next, .btn-submit {
+      background-color: #e67e22;
+      color: #fff;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    /* Animaciones de transición */
+    .fade-out {
+      animation: fadeOut 0.5s forwards;
+    }
+    .fade-in {
+      animation: fadeIn 0.5s forwards;
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Resultado */
+    .result {
+      background: #27ae60;
+      padding: 15px;
+      border-radius: 5px;
+      text-align: center;
+      font-size: 20px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Pantalla de inicio -->
+  <div id="start-screen">
+    <h1>El Laberinto del Conocimiento</h1>
+    <p>¡Prepárate para enfrentar el laberinto y demostrar tu conocimiento sobre Maze Runner!</p>
+    <button id="start-btn">Jugar</button>
+  </div>
+
+  <!-- Contenedor del Quiz -->
+  <div id="quiz-container">
+    <!-- Indicador del progreso en el laberinto -->
+    <div id="maze-progress-container">
+      <div id="maze-container">
+        <svg id="maze-svg" viewBox="0 0 500 300" xmlns="http://www.w3.org/2000/svg">
+          <!-- Fondo del laberinto -->
+          <rect x="0" y="0" width="500" height="300" fill="#2c3e50"/>
+          <!-- Borde exterior -->
+          <rect x="0" y="0" width="500" height="300" fill="none" stroke="#ecf0f1" stroke-width="4"/>
+          
+          <!-- Paredes del camino correcto -->
+          <!-- Segmento 1: horizontal (camino correcto) -->
+          <line x1="30" y1="255" x2="100" y2="255" stroke="#ecf0f1" stroke-width="4"/>
+          <line x1="30" y1="285" x2="100" y2="285" stroke="#ecf0f1" stroke-width="4"/>
+          <!-- Segmento 2: vertical -->
+          <line x1="85" y1="270" x2="85" y2="200" stroke="#ecf0f1" stroke-width="4"/>
+          <line x1="115" y1="270" x2="115" y2="200" stroke="#ecf0f1" stroke-width="4"/>
+          <!-- Segmento 3: horizontal -->
+          <line x1="100" y1="185" x2="200" y2="185" stroke="#ecf0f1" stroke-width="4"/>
+          <line x1="100" y1="215" x2="200" y2="215" stroke="#ecf0f1" stroke-width="4"/>
+          <!-- Segmento 4: vertical -->
+          <line x1="185" y1="200" x2="185" y2="100" stroke="#ecf0f1" stroke-width="4"/>
+          <line x1="215" y1="200" x2="215" y2="100" stroke="#ecf0f1" stroke-width="4"/>
+          <!-- Segmento 5: horizontal -->
+          <line x1="200" y1="85" x2="300" y2="85" stroke="#ecf0f1" stroke-width="4"/>
+          <line x1="200" y1="115" x2="300" y2="115" stroke="#ecf0f1" stroke-width="4"/>
+          <!-- Segmento 6: vertical -->
+          <line x1="285" y1="100" x2="285" y2="150" stroke="#ecf0f1" stroke-width="4"/>
+          <line x1="315" y1="100" x2="315" y2="150" stroke="#ecf0f1" stroke-width="4"/>
+          <!-- Segmento 7: horizontal -->
+          <line x1="300" y1="135" x2="400" y2="135" stroke="#ecf0f1" stroke-width="4"/>
+          <line x1="300" y1="165" x2="400" y2="165" stroke="#ecf0f1" stroke-width="4"/>
+          <!-- Segmento 8: vertical -->
+          <line x1="385" y1="150" x2="385" y2="80" stroke="#ecf0f1" stroke-width="4"/>
+          <line x1="415" y1="150" x2="415" y2="80" stroke="#ecf0f1" stroke-width="4"/>
+          <!-- Segmento 9: horizontal -->
+          <line x1="400" y1="65" x2="470" y2="65" stroke="#ecf0f1" stroke-width="4"/>
+          <line x1="400" y1="95" x2="470" y2="95" stroke="#ecf0f1" stroke-width="4"/>
+
+          <!-- Paredes extra para dar complejidad al laberinto -->
+          <!-- Extra Wall A: Área superior izquierda -->
+          <line x1="30" y1="50" x2="150" y2="50" stroke="#ecf0f1" stroke-width="4"/>
+          <line x1="30" y1="50" x2="30" y2="150" stroke="#ecf0f1" stroke-width="4"/>
+          <line x1="150" y1="50" x2="150" y2="150" stroke="#ecf0f1" stroke-width="4"/>
+          
+          <!-- Extra Wall B: Área inferior central -->
+          <line x1="50" y1="280" x2="200" y2="280" stroke="#ecf0f1" stroke-width="4"/>
+          <line x1="50" y1="280" x2="50" y2="240" stroke="#ecf0f1" stroke-width="4"/>
+          <line x1="200" y1="280" x2="200" y2="240" stroke="#ecf0f1" stroke-width="4"/>
+          
+          <!-- Extra Wall C: Área media derecha -->
+          <line x1="350" y1="200" x2="450" y2="200" stroke="#ecf0f1" stroke-width="4"/>
+          <line x1="350" y1="200" x2="350" y2="250" stroke="#ecf0f1" stroke-width="4"/>
+          <line x1="450" y1="200" x2="450" y2="250" stroke="#ecf0f1" stroke-width="4"/>
+        </svg>
+        <!-- Punto que se mueve -->
+        <div id="maze-dot"></div>
+      </div>
+    </div>
+    
+    <!-- Formulario de preguntas -->
+    <form id="quizForm">
+      <!-- Pregunta 1 -->
+      <div class="question" id="question-1">
+        <p><strong>1. ¿Cómo llega Thomas al Área?</strong></p>
+        <div class="options">
+          <label><input type="radio" name="q1" value="A"> A. Caminando por el bosque</label>
+          <label><input type="radio" name="q1" value="B"> B. En un ascensor (la “Caja”)</label>
+          <label><input type="radio" name="q1" value="C"> C. Es llevado por unos guardias</label>
+          <label><input type="radio" name="q1" value="D"> D. En un helicóptero</label>
+        </div>
+        <button type="button" class="btn-next" onclick="nextQuestion()">Siguiente</button>
+      </div>
+      
+      <!-- Pregunta 2 -->
+      <div class="question" id="question-2">
+        <p><strong>2. Teresa es la primera chica en llegar al Área. (Verdadero/Falso)</strong></p>
+        <div class="options">
+          <label><input type="radio" name="q2" value="Verdadero"> Verdadero</label>
+          <label><input type="radio" name="q2" value="Falso"> Falso</label>
+        </div>
+        <button type="button" class="btn-next" onclick="nextQuestion()">Siguiente</button>
+      </div>
+      
+      <!-- Pregunta 3 -->
+      <div class="question" id="question-3">
+        <p><strong>3. ¿Cuál es el papel de Minho en el Área?</strong></p>
+        <div class="options">
+          <label><input type="radio" name="q3" value="A"> A. Cocinero</label>
+          <label><input type="radio" name="q3" value="B"> B. Constructor de muros</label>
+          <label><input type="radio" name="q3" value="C"> C. Encargado de provisiones</label>
+          <label><input type="radio" name="q3" value="D"> D. Corredor principal (Runner)</label>
+        </div>
+        <button type="button" class="btn-next" onclick="nextQuestion()">Siguiente</button>
+      </div>
+      
+      <!-- Pregunta 4 -->
+      <div class="question" id="question-4">
+        <p><strong>4. Los muros del Laberinto se mueven todas las mañanas. (Verdadero/Falso)</strong></p>
+        <div class="options">
+          <label><input type="radio" name="q4" value="Verdadero"> Verdadero</label>
+          <label><input type="radio" name="q4" value="Falso"> Falso</label>
+        </div>
+        <button type="button" class="btn-next" onclick="nextQuestion()">Siguiente</button>
+      </div>
+      
+      <!-- Pregunta 5 -->
+      <div class="question" id="question-5">
+        <p><strong>5. ¿Qué sucede cuando alguien es picado por un Griever (Lacerador)?</strong></p>
+        <div class="options">
+          <label><input type="radio" name="q5" value="A"> A. Gana superpoderes</label>
+          <label><input type="radio" name="q5" value="B"> B. Olvida a sus amigos</label>
+          <label><input type="radio" name="q5" value="C"> C. Recuerda fragmentos de su pasado</label>
+          <label><input type="radio" name="q5" value="D"> D. Se vuelve inmune a otras heridas</label>
+        </div>
+        <button type="button" class="btn-next" onclick="nextQuestion()">Siguiente</button>
+      </div>
+      
+      <!-- Pregunta 6: Asociación -->
+      <div class="question" id="question-6">
+        <p><strong>6. Empareja cada personaje con su característica más destacada:</strong></p>
+        <p><em>Personajes:</em> 1. Thomas, 2. Newt, 3. Gally, 4. Minho, 5. Teresa</p>
+        <p><em>Características:</em> a. Velocidad y orientación, b. Empatía y diplomacia, c. Coraje para explorar, d. Misterio y conexión con Thomas, e. Desconfianza al cambio</p>
+        <div class="options">
+          <p>Thomas:
+            <select name="q6_1">
+              <option value="">Selecciona</option>
+              <option value="a">a</option>
+              <option value="b">b</option>
+              <option value="c">c</option>
+              <option value="d">d</option>
+              <option value="e">e</option>
+            </select>
+          </p>
+          <p>Newt:
+            <select name="q6_2">
+              <option value="">Selecciona</option>
+              <option value="a">a</option>
+              <option value="b">b</option>
+              <option value="c">c</option>
+              <option value="d">d</option>
+              <option value="e">e</option>
+            </select>
+          </p>
+          <p>Gally:
+            <select name="q6_3">
+              <option value="">Selecciona</option>
+              <option value="a">a</option>
+              <option value="b">b</option>
+              <option value="c">c</option>
+              <option value="d">d</option>
+              <option value="e">e</option>
+            </select>
+          </p>
+          <p>Minho:
+            <select name="q6_4">
+              <option value="">Selecciona</option>
+              <option value="a">a</option>
+              <option value="b">b</option>
+              <option value="c">c</option>
+              <option value="d">d</option>
+              <option value="e">e</option>
+            </select>
+          </p>
+          <p>Teresa:
+            <select name="q6_5">
+              <option value="">Selecciona</option>
+              <option value="a">a</option>
+              <option value="b">b</option>
+              <option value="c">c</option>
+              <option value="d">d</option>
+              <option value="e">e</option>
+            </select>
+          </p>
+        </div>
+        <button type="button" class="btn-next" onclick="nextQuestion()">Siguiente</button>
+      </div>
+      
+      <!-- Pregunta 7 -->
+      <div class="question" id="question-7">
+        <p><strong>7. ¿Qué o quién es CRUEL (WICKED) en la historia?</strong></p>
+        <div class="options">
+          <label><input type="radio" name="q7" value="A"> A. Un grupo de jóvenes que quiere escapar</label>
+          <label><input type="radio" name="q7" value="B"> B. Una organización que controla el experimento del Laberinto</label>
+          <label><input type="radio" name="q7" value="C"> C. Un monstruo más peligroso que los Grievers</label>
+          <label><input type="radio" name="q7" value="D"> D. Un acrónimo que representa “Confianza, Respeto, Unión, Entendimiento y Lealtad”</label>
+        </div>
+        <button type="button" class="btn-next" onclick="nextQuestion()">Siguiente</button>
+      </div>
+      
+      <!-- Pregunta 8 -->
+      <div class="question" id="question-8">
+        <p><strong>8. Chuck es uno de los personajes más jóvenes en El Área. (Verdadero/Falso)</strong></p>
+        <div class="options">
+          <label><input type="radio" name="q8" value="Verdadero"> Verdadero</label>
+          <label><input type="radio" name="q8" value="Falso"> Falso</label>
+        </div>
+        <button type="button" class="btn-next" onclick="nextQuestion()">Siguiente</button>
+      </div>
+      
+      <!-- Pregunta 9 -->
+      <div class="question" id="question-9">
+        <p><strong>9. ¿Para qué servían los mapas que hacían Minho y los otros Corredores?</strong></p>
+        <div class="options">
+          <label><input type="radio" name="q9" value="A"> A. Localizar suministros escondidos</label>
+          <label><input type="radio" name="q9" value="B"> B. Identificar los patrones de movimiento del Laberinto</label>
+          <label><input type="radio" name="q9" value="C"> C. Anotar las habilidades de cada habitante</label>
+          <label><input type="radio" name="q9" value="D"> D. Escoger turnos de guardia en el Área</label>
+        </div>
+        <button type="button" class="btn-next" onclick="nextQuestion()">Siguiente</button>
+      </div>
+      
+      <!-- Pregunta 10 -->
+      <div class="question" id="question-10">
+        <p><strong>10. Los habitantes del Área viven sin reglas ni líderes definidos. (Verdadero/Falso)</strong></p>
+        <div class="options">
+          <label><input type="radio" name="q10" value="Verdadero"> Verdadero</label>
+          <label><input type="radio" name="q10" value="Falso"> Falso</label>
+        </div>
+        <button type="button" class="btn-submit" onclick="finishQuiz()">Enviar respuestas</button>
+      </div>
+    </form>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    // Variables globales
+    let currentQuestion = 0;
+    const questions = document.querySelectorAll('.question');
+    const totalQuestions = questions.length;
+    
+    // Coordenadas del camino correcto (ya definidas para 10 preguntas)
+    const mazePositions = [
+      { left: "30px",  top: "270px" },   // Q1: Inicio
+      { left: "100px", top: "270px" },   // Q2
+      { left: "100px", top: "200px" },   // Q3
+      { left: "200px", top: "200px" },   // Q4
+      { left: "200px", top: "100px" },   // Q5
+      { left: "300px", top: "100px" },   // Q6
+      { left: "300px", top: "150px" },   // Q7
+      { left: "400px", top: "150px" },   // Q8
+      { left: "400px", top: "80px" },    // Q9
+      { left: "470px", top: "80px" }     // Q10: Salida
+    ];
+    
+    const mazeDot = document.getElementById('maze-dot');
+    const quizContainer = document.getElementById('quiz-container');
+
+    // Iniciar juego
+    document.getElementById('start-btn').addEventListener('click', function() {
+      document.getElementById('start-screen').style.display = "none";
+      quizContainer.style.display = "block";
+      currentQuestion = 0;
+      questions[currentQuestion].style.display = "block";
+      updateMazeDot(currentQuestion);
+    });
+
+    // Actualiza la posición del punto en el laberinto
+    function updateMazeDot(index) {
+      const pos = mazePositions[index];
+      mazeDot.style.left = pos.left;
+      mazeDot.style.top = pos.top;
+    }
+
+    // Avanza a la siguiente pregunta con animación
+    function nextQuestion() {
+      const current = questions[currentQuestion];
+      current.classList.add('fade-out');
+      setTimeout(function(){
+        current.style.display = "none";
+        current.classList.remove('fade-out');
+        currentQuestion++;
+        if(currentQuestion < totalQuestions) {
+          const next = questions[currentQuestion];
+          next.style.display = "block";
+          next.classList.add('fade-in');
+          setTimeout(() => { next.classList.remove('fade-in'); }, 500);
+          updateMazeDot(currentQuestion);
+        }
+      }, 500);
+    }
+
+    // Calcula y muestra el puntaje final (sin retroalimentación detallada)
+    function finishQuiz() {
+      let score = 0;
+      const q1 = document.querySelector('input[name="q1"]:checked');
+      if(q1 && q1.value === "B") score++;
+      const q2 = document.querySelector('input[name="q2"]:checked');
+      if(q2 && q2.value === "Verdadero") score++;
+      const q3 = document.querySelector('input[name="q3"]:checked');
+      if(q3 && q3.value === "D") score++;
+      const q4 = document.querySelector('input[name="q4"]:checked');
+      if(q4 && q4.value === "Falso") score++;
+      const q5 = document.querySelector('input[name="q5"]:checked');
+      if(q5 && q5.value === "C") score++;
+      const q6_1 = document.querySelector('select[name="q6_1"]').value;
+      const q6_2 = document.querySelector('select[name="q6_2"]').value;
+      const q6_3 = document.querySelector('select[name="q6_3"]').value;
+      const q6_4 = document.querySelector('select[name="q6_4"]').value;
+      const q6_5 = document.querySelector('select[name="q6_5"]').value;
+      if(q6_1 === "c" && q6_2 === "b" && q6_3 === "e" && q6_4 === "a" && q6_5 === "d") score++;
+      const q7 = document.querySelector('input[name="q7"]:checked');
+      if(q7 && q7.value === "B") score++;
+      const q8 = document.querySelector('input[name="q8"]:checked');
+      if(q8 && q8.value === "Verdadero") score++;
+      const q9 = document.querySelector('input[name="q9"]:checked');
+      if(q9 && q9.value === "B") score++;
+      const q10 = document.querySelector('input[name="q10"]:checked');
+      if(q10 && q10.value === "Falso") score++;
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.style.display = "block";
+      resultDiv.innerHTML = "<p>Obtuviste " + score + " de " + totalQuestions + " respuestas correctas.</p>";
+    }
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
