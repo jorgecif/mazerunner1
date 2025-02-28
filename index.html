@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>El Laberinto del Conocimiento - Quiz Maze Runner</title>
   <style>
     /* Estilos generales */
@@ -11,6 +12,7 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      font-size: 18px;
     }
     h1, h2, p {
       text-align: center;
@@ -20,7 +22,7 @@
       border: none;
       padding: 10px 20px;
       border-radius: 5px;
-      font-size: 16px;
+      font-size: 18px;
     }
 
     /* Pantalla de inicio */
@@ -72,14 +74,13 @@
       height: 100%;
       display: block;
     }
-    /* El punto que se mueve en el laberinto */
+    /* Punto que se mueve en el laberinto */
     #maze-dot {
       position: absolute;
       width: 15px;
       height: 15px;
       background-color: #e74c3c;
       border-radius: 50%;
-      /* Posición inicial */
       left: 30px;
       top: 270px;
       transition: left 0.5s, top 0.5s;
@@ -133,6 +134,39 @@
       font-size: 20px;
       display: none;
     }
+
+    /* Responsive: Ajustes para móviles */
+    @media screen and (max-width: 600px) {
+      body {
+        font-size: 22px;
+      }
+      #start-screen h1 {
+        font-size: 32px;
+      }
+      #start-screen p {
+        font-size: 20px;
+      }
+      button {
+        font-size: 20px;
+        padding: 12px 24px;
+      }
+      #maze-container {
+        width: 95%;
+        height: auto;
+      }
+      /* Se ajusta el SVG para que mantenga la relación de aspecto */
+      #maze-svg {
+        width: 100%;
+        height: auto;
+      }
+      .question {
+        font-size: 20px;
+      }
+      .btn-next, .btn-submit {
+        font-size: 20px;
+        padding: 12px 24px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -154,52 +188,40 @@
           <!-- Borde exterior -->
           <rect x="0" y="0" width="500" height="300" fill="none" stroke="#ecf0f1" stroke-width="4"/>
           
-          <!-- Paredes del camino correcto -->
-          <!-- Segmento 1: horizontal (camino correcto) -->
+          <!-- Camino correcto -->
           <line x1="30" y1="255" x2="100" y2="255" stroke="#ecf0f1" stroke-width="4"/>
           <line x1="30" y1="285" x2="100" y2="285" stroke="#ecf0f1" stroke-width="4"/>
-          <!-- Segmento 2: vertical -->
           <line x1="85" y1="270" x2="85" y2="200" stroke="#ecf0f1" stroke-width="4"/>
           <line x1="115" y1="270" x2="115" y2="200" stroke="#ecf0f1" stroke-width="4"/>
-          <!-- Segmento 3: horizontal -->
           <line x1="100" y1="185" x2="200" y2="185" stroke="#ecf0f1" stroke-width="4"/>
           <line x1="100" y1="215" x2="200" y2="215" stroke="#ecf0f1" stroke-width="4"/>
-          <!-- Segmento 4: vertical -->
           <line x1="185" y1="200" x2="185" y2="100" stroke="#ecf0f1" stroke-width="4"/>
           <line x1="215" y1="200" x2="215" y2="100" stroke="#ecf0f1" stroke-width="4"/>
-          <!-- Segmento 5: horizontal -->
           <line x1="200" y1="85" x2="300" y2="85" stroke="#ecf0f1" stroke-width="4"/>
           <line x1="200" y1="115" x2="300" y2="115" stroke="#ecf0f1" stroke-width="4"/>
-          <!-- Segmento 6: vertical -->
           <line x1="285" y1="100" x2="285" y2="150" stroke="#ecf0f1" stroke-width="4"/>
           <line x1="315" y1="100" x2="315" y2="150" stroke="#ecf0f1" stroke-width="4"/>
-          <!-- Segmento 7: horizontal -->
           <line x1="300" y1="135" x2="400" y2="135" stroke="#ecf0f1" stroke-width="4"/>
           <line x1="300" y1="165" x2="400" y2="165" stroke="#ecf0f1" stroke-width="4"/>
-          <!-- Segmento 8: vertical -->
           <line x1="385" y1="150" x2="385" y2="80" stroke="#ecf0f1" stroke-width="4"/>
           <line x1="415" y1="150" x2="415" y2="80" stroke="#ecf0f1" stroke-width="4"/>
-          <!-- Segmento 9: horizontal -->
           <line x1="400" y1="65" x2="470" y2="65" stroke="#ecf0f1" stroke-width="4"/>
           <line x1="400" y1="95" x2="470" y2="95" stroke="#ecf0f1" stroke-width="4"/>
-
-          <!-- Paredes extra para dar complejidad al laberinto -->
+          
+          <!-- Paredes extra para mayor complejidad -->
           <!-- Extra Wall A: Área superior izquierda -->
           <line x1="30" y1="50" x2="150" y2="50" stroke="#ecf0f1" stroke-width="4"/>
           <line x1="30" y1="50" x2="30" y2="150" stroke="#ecf0f1" stroke-width="4"/>
           <line x1="150" y1="50" x2="150" y2="150" stroke="#ecf0f1" stroke-width="4"/>
-          
           <!-- Extra Wall B: Área inferior central -->
           <line x1="50" y1="280" x2="200" y2="280" stroke="#ecf0f1" stroke-width="4"/>
           <line x1="50" y1="280" x2="50" y2="240" stroke="#ecf0f1" stroke-width="4"/>
           <line x1="200" y1="280" x2="200" y2="240" stroke="#ecf0f1" stroke-width="4"/>
-          
           <!-- Extra Wall C: Área media derecha -->
           <line x1="350" y1="200" x2="450" y2="200" stroke="#ecf0f1" stroke-width="4"/>
           <line x1="350" y1="200" x2="350" y2="250" stroke="#ecf0f1" stroke-width="4"/>
           <line x1="450" y1="200" x2="450" y2="250" stroke="#ecf0f1" stroke-width="4"/>
         </svg>
-        <!-- Punto que se mueve -->
         <div id="maze-dot"></div>
       </div>
     </div>
@@ -375,7 +397,7 @@
     const questions = document.querySelectorAll('.question');
     const totalQuestions = questions.length;
     
-    // Coordenadas del camino correcto (ya definidas para 10 preguntas)
+    // Coordenadas del camino correcto para el punto (según el SVG)
     const mazePositions = [
       { left: "30px",  top: "270px" },   // Q1: Inicio
       { left: "100px", top: "270px" },   // Q2
@@ -401,7 +423,7 @@
       updateMazeDot(currentQuestion);
     });
 
-    // Actualiza la posición del punto en el laberinto
+    // Actualiza la posición del punto
     function updateMazeDot(index) {
       const pos = mazePositions[index];
       mazeDot.style.left = pos.left;
@@ -426,7 +448,7 @@
       }, 500);
     }
 
-    // Calcula y muestra el puntaje final (sin retroalimentación detallada)
+    // Calcula y muestra el puntaje final
     function finishQuiz() {
       let score = 0;
       const q1 = document.querySelector('input[name="q1"]:checked');
@@ -461,6 +483,8 @@
   </script>
 </body>
 </html>
+
+
 
 
 
